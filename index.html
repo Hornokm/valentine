@@ -11,40 +11,42 @@
     html, body {
       width: 100%; height: 100%;
       overflow: hidden;
-      -webkit-user-select: none;
-      user-select: none;
+      -webkit-user-select: none; user-select: none;
     }
 
     body {
       font-family: 'Nunito', sans-serif;
       background: radial-gradient(ellipse at 40% 30%, #ffc2d4, #f48fb1 60%, #e8638c);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       min-height: 100dvh;
     }
 
-    .hearts-bg { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+    /* ── Floating hearts ── */
+    #heartsBg {
+      position: fixed; inset: 0;
+      pointer-events: none; overflow: hidden; z-index: 0;
+    }
     .hb {
       position: absolute;
-      bottom: -50px; left: var(--x);
+      bottom: -50px;
+      left: var(--x);
       font-size: var(--s);
-      animation: rise var(--d) linear infinite;
-      animation-delay: var(--delay);
       opacity: 0;
+      will-change: transform, opacity;
+      animation: rise var(--d) linear var(--delay) infinite;
     }
     @keyframes rise {
-      0%   { transform: translateY(0);      opacity: 0; }
-      10%  { opacity: .5; }
-      90%  { opacity: .25; }
-      100% { transform: translateY(-110vh); opacity: 0; }
+      0%   { transform: translateY(0)      translateX(var(--px, 0px)); opacity: 0;   }
+      10%  {                                                             opacity: .5;  }
+      90%  {                                                             opacity: .25; }
+      100% { transform: translateY(-110vh) translateX(var(--px, 0px)); opacity: 0;   }
     }
 
+    /* ── Card ── */
     .card {
       position: relative; z-index: 1;
       background: rgba(255,255,255,.78);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
       border: 2px solid rgba(255,255,255,.9);
       border-radius: 32px;
       padding: 36px 28px 32px;
@@ -58,7 +60,6 @@
       to   { transform: scale(1);   opacity: 1; }
     }
 
-    /* ── Heading ── */
     .card h1 {
       font-family: 'Baloo 2', cursive;
       font-size: clamp(1.5rem, 6vw, 2rem);
@@ -74,6 +75,7 @@
       margin-bottom: 22px;
     }
     .cat-svg {
+      display: block;
       width: min(140px, 38vw);
       height: min(140px, 38vw);
       filter: drop-shadow(0 6px 16px rgba(200,60,100,.2));
@@ -83,21 +85,33 @@
       0%,100% { transform: translateY(0); }
       50%      { transform: translateY(-8px); }
     }
+    @keyframes joyBounce {
+      0%   { transform: translateY(0)     rotate(0deg)   scale(1);    }
+      20%  { transform: translateY(-30px) rotate(-14deg) scale(1.18); }
+      40%  { transform: translateY(-44px) rotate(16deg)  scale(1.22); }
+      58%  { transform: translateY(-22px) rotate(-8deg)  scale(1.1);  }
+      74%  { transform: translateY(-32px) rotate(10deg)  scale(1.14); }
+      88%  { transform: translateY(-8px)  rotate(-3deg)  scale(1.04); }
+      100% { transform: translateY(0)     rotate(0deg)   scale(1);    }
+    }
+
     .sp {
-      position: absolute;
-      pointer-events: none;
+      position: absolute; pointer-events: none;
       animation: twinkle 1.8s ease-in-out infinite;
       font-size: .95rem;
     }
-    .sp:nth-child(1) { top: 8px;  left: -10px;              animation-delay: 0s; }
-    .sp:nth-child(2) { top: 8px;  right: -10px;             animation-delay: .5s; }
+    .sp:nth-child(1) { top: 8px;  left: -10px;  animation-delay: 0s; }
+    .sp:nth-child(2) { top: 8px;  right: -10px; animation-delay: .5s; }
     .sp:nth-child(3) { top: -8px; left: 50%; transform: translateX(-50%); animation-delay: 1s; }
     @keyframes twinkle {
       0%,100% { opacity: .15; transform: scale(.7); }
       50%      { opacity: 1;   transform: scale(1.3); }
     }
 
-    /* ── Buttons ── */
+    /* ── Buttons ──
+       Fixed px widths set by JS. Transition only on width + opacity.
+       No flex tricks — stable layout guaranteed.
+    ── */
     .btn-row {
       display: flex;
       justify-content: center;
@@ -107,84 +121,56 @@
 
     .btn {
       font-family: 'Baloo 2', cursive;
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 800;
-      padding: 13px 0;
-      width: 44%;
+      height: 50px;
+      padding: 0 8px;
       border: none;
       border-radius: 50px;
       cursor: pointer;
       outline: none;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: width .42s cubic-bezier(.34,1.56,.64,1),
+                  opacity .3s ease;
     }
 
     #btnYes {
       background: linear-gradient(135deg, #4caf82, #2e8b5e);
       color: #fff;
       box-shadow: 0 5px 18px rgba(76,175,130,.45);
-      transition: font-size .35s cubic-bezier(.34,1.56,.64,1),
-                  padding   .35s cubic-bezier(.34,1.56,.64,1);
     }
-
     #btnNo {
       background: linear-gradient(135deg, #e05555, #b83d3d);
       color: #fff;
       box-shadow: 0 5px 18px rgba(220,80,80,.4);
-      /* slide out transition */
-      transition: transform .4s cubic-bezier(.55,.05,.67,.19), opacity .3s;
-      transform-origin: center;
-    }
-    /* when dismissed — slides down and fades */
-    #btnNo.gone {
-      transform: translateY(80px);
-      opacity: 0;
-      pointer-events: none;
     }
 
-    /* ── Toast ── */
-    .toast {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-120px);
-      z-index: 9000;
-      background: rgba(255,255,255,.95);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 2px solid rgba(214,55,112,.2);
-      border-radius: 20px;
-      padding: 13px 22px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 6px 28px rgba(160,40,80,.18);
-      pointer-events: none;
-      transition: transform .38s cubic-bezier(.34,1.56,.64,1), opacity .3s;
-      opacity: 0;
-      max-width: 84vw;
+    /* Glow pulse on Yes after each No click */
+    @keyframes yesPulse {
+      0%   { box-shadow: 0 5px 18px rgba(76,175,130,.45); }
+      45%  { box-shadow: 0 5px 30px rgba(76,175,130,.9), 0 0 0 7px rgba(76,175,130,.18); }
+      100% { box-shadow: 0 5px 18px rgba(76,175,130,.45); }
     }
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
-    .toast-icon { font-size: 1.5rem; flex-shrink: 0; line-height: 1; }
-    .toast-msg {
-      font-family: 'Baloo 2', cursive;
-      font-size: clamp(.9rem, 4vw, 1.05rem);
-      color: #b02d5a;
-    }
+    #btnYes.pulsing { animation: yesPulse .5s ease-out both; }
 
+    /* ── Yes screen ── */
     #yesScreen { display: none; }
-    #yesScreen.show {
+    #yesScreen.visible {
       display: block;
-      animation: popIn .45s cubic-bezier(.34,1.56,.64,1) both;
+      animation: popIn .38s cubic-bezier(.34,1.56,.64,1) both;
     }
-    #yesScreen h1 { font-size: clamp(1.8rem, 7vw, 2.3rem); color: #d63770; }
-    #yesScreen p  { font-size: 1rem; color: #7a3050; margin-top: 10px; line-height: 1.6; }
+    #yesScreen h1 {
+      font-family: 'Baloo 2', cursive;
+      font-size: clamp(1.8rem, 7vw, 2.3rem);
+      color: #d63770;
+    }
+    #yesScreen p { font-size: 1rem; color: #7a3050; margin-top: 10px; line-height: 1.6; }
+
     .big-heart {
-      font-size: 5rem;
-      display: block;
+      font-size: 5rem; display: block;
       margin: 10px auto 8px;
       animation: pulse .8s ease-in-out infinite;
     }
@@ -194,13 +180,36 @@
       65%      { transform: scale(1.08); }
     }
 
-    /* ── Confetti ── */
+    /* ── Toast ── */
+    .toast {
+      position: fixed; top: 20px; left: 50%;
+      transform: translateX(-50%) translateY(-120px);
+      z-index: 9000;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border: 2px solid rgba(214,55,112,.2);
+      border-radius: 20px; padding: 13px 22px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 6px 28px rgba(160,40,80,.18);
+      pointer-events: none;
+      transition: transform .38s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+      opacity: 0; max-width: 84vw;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast-icon { font-size: 1.5rem; flex-shrink: 0; line-height: 1; }
+    .toast-msg  {
+      font-family: 'Baloo 2', cursive;
+      font-size: clamp(.9rem, 4vw, 1.05rem);
+      color: #b02d5a;
+    }
+
+    /* ── Confetti canvas ── */
     #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
   </style>
 </head>
 <body>
 
-<div class="hearts-bg" id="heartsBg"></div>
+<div id="heartsBg"></div>
 <canvas id="confetti"></canvas>
 
 <div class="card">
@@ -211,17 +220,24 @@
       <span class="sp">✨</span>
       <span class="sp">💗</span>
       <span class="sp">✨</span>
-      <svg class="cat-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="cat-svg" id="catSvg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
         <ellipse cx="100" cy="138" rx="54" ry="46" fill="#fff0f5" stroke="#e8b4c8" stroke-width="2.5"/>
         <circle  cx="100" cy="88"  r="46"           fill="#fff0f5" stroke="#e8b4c8" stroke-width="2.5"/>
         <polygon points="60,52 50,22 80,46"    fill="#ffd0e0" stroke="#e8b4c8" stroke-width="2"/>
         <polygon points="62,50 54,28 76,46"    fill="#ffb3cc"/>
         <polygon points="140,52 150,22 120,46" fill="#ffd0e0" stroke="#e8b4c8" stroke-width="2"/>
         <polygon points="138,50 146,28 124,46" fill="#ffb3cc"/>
-        <g transform="translate(100,48)">
-          <ellipse cx="-16" cy="0" rx="14" ry="9" fill="#7ec8e3" stroke="#5aa8c8" stroke-width="1.5"/>
-          <ellipse cx="16"  cy="0" rx="14" ry="9" fill="#7ec8e3" stroke="#5aa8c8" stroke-width="1.5"/>
-          <circle  cx="0"   cy="0" r="6"           fill="#5aa8c8"/>
+        <!-- Left eye -->
+        <g transform="translate(84,48)">
+          <ellipse cx="0" cy="0" rx="14" ry="9" fill="#7ec8e3" stroke="#5aa8c8" stroke-width="1.5"/>
+          <circle id="pupilL" cx="0" cy="0" r="5" fill="#2a607a"/>
+          <circle cx="2" cy="-2" r="2" fill="rgba(255,255,255,.7)"/>
+        </g>
+        <!-- Right eye -->
+        <g transform="translate(116,48)">
+          <ellipse cx="0" cy="0" rx="14" ry="9" fill="#7ec8e3" stroke="#5aa8c8" stroke-width="1.5"/>
+          <circle id="pupilR" cx="0" cy="0" r="5" fill="#2a607a"/>
+          <circle cx="2" cy="-2" r="2" fill="rgba(255,255,255,.7)"/>
         </g>
         <ellipse cx="72"  cy="96" rx="13" ry="8" fill="#ffb3cc" opacity=".65"/>
         <ellipse cx="128" cy="96" rx="13" ry="8" fill="#ffb3cc" opacity=".65"/>
@@ -255,7 +271,7 @@
   <div id="yesScreen">
     <span class="big-heart">💖</span>
     <h1>JAAAAAAAAAY! Miluju tě! 🎉</h1>
-    <p>Věděla jsem to! 🥰<br>Šťastný Valentýn, lásko! 💕</p>
+    <p>Já to věděl! 🥰<br>Šťastný Valentýn! 💕</p>
   </div>
 </div>
 
@@ -266,41 +282,10 @@
 
 <script>
 (function () {
+  'use strict';
 
-  /* ── Floating hearts ── */
-  const bg = document.getElementById('heartsBg');
-  const emos = ['💕','💗','💓','💞','🌸','✨','💝','🌷'];
-  for (let i = 0; i < 24; i++) {
-    const s = document.createElement('span');
-    s.className = 'hb';
-    s.textContent = emos[i % emos.length];
-    s.style.setProperty('--x',     Math.random() * 100 + 'vw');
-    s.style.setProperty('--d',     (8 + Math.random() * 8) + 's');
-    s.style.setProperty('--s',     (.8 + Math.random() * 1.1) + 'rem');
-    s.style.setProperty('--delay', (Math.random() * 12) + 's');
-    bg.appendChild(s);
-  }
-
-  /* ── Elements ── */
-  const btnYes    = document.getElementById('btnYes');
-  const btnNo     = document.getElementById('btnNo');
-  const toast     = document.getElementById('toast');
-  const toastIcon = document.getElementById('toastIcon');
-  const toastMsg  = document.getElementById('toastMsg');
-
-  /* base values for Yes growth */
-  const BASE_FONT = 1.15;  // rem
-  const BASE_PAD  = 13;    // px
-
-  function growYes(step) {
-    const f = Math.min(BASE_FONT + step * 0.12, BASE_FONT + 5 * 0.12);
-    const p = Math.min(BASE_PAD  + step * 4,    BASE_PAD  + 5 * 4);
-    btnYes.style.fontSize = f + 'rem';
-    btnYes.style.padding  = p + 'px 0';
-  }
-  /* ── Messages ──
-     Last message = No slides away, only Yes remains */
-  const msgs = [
+  /* ── Constants ── */
+  const MSGS = [
     { icon: '🥺', text: 'Jsi si jistá?' },
     { icon: '👉👈', text: 'Zkus to znovu...' },
     { icon: '😿', text: 'Kočička teď pláče!' },
@@ -309,9 +294,97 @@
   ];
   const LAST_MSG = { icon: '😂', text: 'Nemáš jinou možnost!' };
 
-  let noCount   = 0;
-  let toastTimer = null;
+  // Pixel widths per step. YES grows, NO shrinks, gap stays 12px.
+  // Row total = YES + 12 + NO = always 272px → card never shifts.
+  const YES_W = [130, 142, 155, 170, 185, 200, 260];
+  const NO_W  = [130, 118, 104,  88,  72,   56,   0];
 
+  /* ── DOM refs ── */
+  const btnYes    = document.getElementById('btnYes');
+  const btnNo     = document.getElementById('btnNo');
+  const catSvg    = document.getElementById('catSvg');
+  const pupilL    = document.getElementById('pupilL');
+  const pupilR    = document.getElementById('pupilR');
+  const toast     = document.getElementById('toast');
+  const toastIcon = document.getElementById('toastIcon');
+  const toastMsg  = document.getElementById('toastMsg');
+  const mainScr   = document.getElementById('mainScreen');
+  const yesScr    = document.getElementById('yesScreen');
+  const confCv    = document.getElementById('confetti');
+  const confCtx   = confCv.getContext('2d');
+
+  /* ── 1. Init button widths (before any transition) ── */
+  btnYes.style.width = YES_W[0] + 'px';
+  btnNo.style.width  = NO_W[0]  + 'px';
+
+  /* ── 2. Floating hearts + parallax ── */
+  const bg       = document.getElementById('heartsBg');
+  const emos     = ['💕','💗','💓','💞','🌸','✨','💝','🌷'];
+  const heartEls = [];
+
+  for (let i = 0; i < 24; i++) {
+    const el = document.createElement('span');
+    el.className = 'hb';
+    el.textContent = emos[i % emos.length];
+    el.style.setProperty('--x',     (Math.random() * 100) + 'vw');
+    el.style.setProperty('--d',     (8 + Math.random() * 8) + 's');
+    el.style.setProperty('--s',     (.8 + Math.random() * 1.1) + 'rem');
+    el.style.setProperty('--delay', (Math.random() * 12) + 's');
+    el._depth = 0.01 + Math.random() * 0.03;
+    bg.appendChild(el);
+    heartEls.push(el);
+  }
+
+  let tPX = 0, cPX = 0, rafId = null;
+
+  function parallaxLoop() {
+    cPX += (tPX - cPX) * 0.08;
+    for (const el of heartEls) {
+      el.style.setProperty('--px', (cPX * el._depth * 60).toFixed(1) + 'px');
+    }
+    rafId = requestAnimationFrame(parallaxLoop);
+  }
+  parallaxLoop();
+
+  /* ── 3. Eye tracking ── */
+  const EYES   = [{ pupil: pupilL, ox: 84 }, { pupil: pupilR, ox: 116 }];
+  const EYE_OY = 48, MAX_PX = 4.5;
+
+  function movePupils(cx, cy) {
+    const r = catSvg.getBoundingClientRect();
+    const sx = (cx - r.left) / r.width  * 200;
+    const sy = (cy - r.top)  / r.height * 200;
+    for (const { pupil, ox } of EYES) {
+      const dx = sx - ox, dy = sy - EYE_OY;
+      const d  = Math.sqrt(dx*dx + dy*dy) || 1;
+      const k  = Math.min(d, MAX_PX) / d;
+      pupil.setAttribute('cx', (dx * k).toFixed(2));
+      pupil.setAttribute('cy', (dy * k).toFixed(2));
+    }
+  }
+  function resetPupils() {
+    for (const { pupil } of EYES) {
+      pupil.setAttribute('cx', '0');
+      pupil.setAttribute('cy', '0');
+    }
+  }
+
+  // Single mousemove handler for both parallax and eyes
+  document.addEventListener('mousemove', e => {
+    tPX = (e.clientX / window.innerWidth - 0.5) * 2;
+    movePupils(e.clientX, e.clientY);
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (!e.touches.length) return;
+    tPX = (e.touches[0].clientX / window.innerWidth - 0.5) * 2;
+    movePupils(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+
+  document.addEventListener('mouseleave', resetPupils);
+
+  /* ── 4. Toast ── */
+  let toastTimer = null;
   function showToast(icon, text) {
     toastIcon.textContent = icon;
     toastMsg.textContent  = text;
@@ -320,52 +393,83 @@
     toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
   }
 
-  /* ── No clicked ── */
-  btnNo.addEventListener('click', handleNo);
-  btnNo.addEventListener('touchend', function(e) {
-    e.preventDefault();
-    handleNo();
-  }, { passive: false });
+  /* ── 5. NO handler ── */
+  let noCount = 0;
 
   function handleNo() {
+    if (noCount >= YES_W.length - 1) return;
     noCount++;
 
-    if (noCount <= msgs.length) {
-      const msg = msgs[noCount - 1];
+    btnYes.style.width = YES_W[noCount] + 'px';
+    btnNo.style.width  = NO_W[noCount]  + 'px';
+
+    // Glow pulse on Yes
+    btnYes.classList.remove('pulsing');
+    void btnYes.offsetWidth;
+    btnYes.classList.add('pulsing');
+
+    if (noCount < MSGS.length + 1) {
+      const msg = MSGS[noCount - 1] || LAST_MSG;
       showToast(msg.icon, msg.text);
-      growYes(noCount);
-    } else {
-      showToast(LAST_MSG.icon, LAST_MSG.text);
-      btnNo.classList.add('gone');
-      growYes(msgs.length + 1);
+    }
+
+    // After last step, hide No (width is already 0, just remove it visually)
+    if (NO_W[noCount] === 0) {
+      btnNo.style.opacity       = '0';
+      btnNo.style.pointerEvents = 'none';
     }
   }
 
-  /* ── Yes clicked ── */
-  btnYes.addEventListener('click', showYes);
-  btnYes.addEventListener('touchend', function(e) {
-    e.preventDefault();
-    showYes();
-  }, { passive: false });
+  btnNo.addEventListener('click',    handleNo);
+  btnNo.addEventListener('touchend', e => { e.preventDefault(); handleNo(); }, { passive: false });
 
-  function showYes() {
-    document.getElementById('mainScreen').style.display = 'none';
-    document.getElementById('yesScreen').classList.add('show');
-    btnNo.style.display = 'none';
+  /* ── 6. YES handler ──
+     a) Kill transitions so No disappearing doesn't yank Yes
+     b) Fade No out with opacity (no layout change)
+     c) Play joy bounce
+     d) animationend → swap screens smoothly
+  ── */
+  let yesFired = false;
+
+  function handleYes() {
+    if (yesFired) return;
+    yesFired = true;
+
+    // a) Freeze layout — no more transitions on buttons
+    btnYes.style.transition = 'none';
+    btnNo.style.transition  = 'none';
+
+    // b) Fade No out without touching width (zero reflow = Yes stays put)
+    btnNo.style.opacity       = '0';
+    btnNo.style.pointerEvents = 'none';
+
     toast.classList.remove('show');
-    launchConfetti();
+
+    // c) Joy bounce — restart animation cleanly
+    catSvg.style.animation = 'none';
+    void catSvg.offsetWidth;
+    catSvg.style.animation = 'joyBounce .72s cubic-bezier(.34,1.56,.64,1) both';
+
+    // d) Swap exactly on animationend
+    catSvg.addEventListener('animationend', function onEnd() {
+      catSvg.removeEventListener('animationend', onEnd);
+      mainScr.style.display = 'none';
+      yesScr.classList.add('visible');
+      cancelAnimationFrame(rafId);
+      launchConfetti();
+    });
   }
 
-  /* ── Confetti ── */
-  const cv  = document.getElementById('confetti');
-  const ctx = cv.getContext('2d');
+  btnYes.addEventListener('click',    handleYes);
+  btnYes.addEventListener('touchend', e => { e.preventDefault(); handleYes(); }, { passive: false });
 
+  /* ── 7. Confetti ── */
   function launchConfetti() {
-    cv.width  = window.innerWidth;
-    cv.height = window.innerHeight;
+    confCv.width  = window.innerWidth;
+    confCv.height = window.innerHeight;
     const colors = ['#e8638c','#f4a0bc','#7ec8e3','#4caf82','#ffe082','#ce93d8','#ff8a80'];
     const pieces = Array.from({ length: 110 }, () => ({
-      x: Math.random() * cv.width,
+      x: Math.random() * confCv.width,
       y: -10 - Math.random() * 150,
       r: 4 + Math.random() * 5,
       d: 1.8 + Math.random() * 2.4,
@@ -375,21 +479,23 @@
       rect: Math.random() > .45,
     }));
     (function draw() {
-      ctx.clearRect(0, 0, cv.width, cv.height);
+      confCtx.clearRect(0, 0, confCv.width, confCv.height);
       let live = false;
-      pieces.forEach(p => {
+      for (const p of pieces) {
         p.a += p.as; p.y += p.d;
-        ctx.fillStyle = p.c;
+        confCtx.fillStyle = p.c;
         if (p.rect) {
-          ctx.save();
-          ctx.translate(p.x, p.y); ctx.rotate(p.a);
-          ctx.fillRect(-p.r, -p.r * .5, p.r * 2, p.r);
-          ctx.restore();
+          confCtx.save();
+          confCtx.translate(p.x, p.y); confCtx.rotate(p.a);
+          confCtx.fillRect(-p.r, -p.r * .5, p.r * 2, p.r);
+          confCtx.restore();
         } else {
-          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+          confCtx.beginPath();
+          confCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          confCtx.fill();
         }
-        if (p.y < cv.height + 30) live = true;
-      });
+        if (p.y < confCv.height + 30) live = true;
+      }
       if (live) requestAnimationFrame(draw);
     })();
   }
