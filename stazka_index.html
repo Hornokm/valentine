@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Will you be my Valentine? 💕</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(ellipse at 40% 30%, #ffc2d4, #f48fb1 60%, #e8638c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+    }
+
+    /* ── Floating hearts ── */
+    .hearts-bg {
+      position: fixed; inset: 0;
+      pointer-events: none; overflow: hidden; z-index: 0;
+    }
+    .hb {
+      position: absolute;
+      bottom: -50px; left: var(--x);
+      font-size: var(--s);
+      animation: rise var(--d) linear infinite;
+      animation-delay: var(--delay);
+      opacity: 0;
+    }
+    @keyframes rise {
+      0%   { transform: translateY(0);       opacity: 0; }
+      10%  { opacity: .5; }
+      90%  { opacity: .25; }
+      100% { transform: translateY(-105vh);  opacity: 0; }
+    }
+
+    /* ── Card ── */
+    .card {
+      position: relative; z-index: 1;
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 2px solid rgba(255,255,255,.9);
+      border-radius: 32px;
+      padding: 36px 28px 32px;
+      text-align: center;
+      box-shadow: 0 16px 56px rgba(160,40,80,.22);
+      width: min(86vw, 360px);
+      animation: popIn .5s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes popIn {
+      from { transform: scale(.75); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    /* ── Heading ── */
+    .card h1 {
+      font-family: 'Baloo 2', cursive;
+      font-size: clamp(1.5rem, 6vw, 2rem);
+      color: #d63770;
+      margin-bottom: 18px;
+      line-height: 1.2;
+    }
+
+    /* ── Cat ── */
+    .cat-wrap {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 22px;
+    }
+    .cat-svg {
+      width: min(140px, 38vw);
+      height: min(140px, 38vw);
+      filter: drop-shadow(0 6px 16px rgba(200,60,100,.2));
+      animation: bob 2.4s ease-in-out infinite;
+    }
+    @keyframes bob {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+    .sp {
+      position: absolute;
+      pointer-events: none;
+      animation: twinkle 1.8s ease-in-out infinite;
+      font-size: .95rem;
+    }
+    .sp:nth-child(1) { top: 8px;  left: -10px; animation-delay: 0s; }
+    .sp:nth-child(2) { top: 8px;  right:-10px; animation-delay: .5s; }
+    .sp:nth-child(3) { top: -8px; left: 50%; transform: translateX(-50%); animation-delay: 1s; }
+    @keyframes twinkle {
+      0%,100% { opacity: .15; transform: scale(.7); }
+      50%      { opacity: 1;   transform: scale(1.3); }
+    }
+
+    /* ── Buttons row ── */
+    .btn-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      /* min-height keeps card stable after No goes flying */
+      min-height: 56px;
+    }
+
+    .btn {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.15rem;
+      font-weight: 800;
+      padding: 13px 36px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #btnYes {
+      background: linear-gradient(135deg, #4caf82, #2e8b5e);
+      color: #fff;
+      box-shadow: 0 5px 18px rgba(76,175,130,.45);
+      /* smooth grow animation */
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+      transform-origin: center;
+    }
+
+    /* No lives at fixed position over the whole screen */
+    #btnNo {
+      background: linear-gradient(135deg, #e05555, #b83d3d);
+      color: #fff;
+      box-shadow: 0 5px 18px rgba(220,80,80,.4);
+      position: fixed;
+      /* will be placed by JS after load */
+      z-index: 500;
+      touch-action: none;
+      /* no transition — instant teleport */
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-110px);
+      z-index: 9000;
+      background: rgba(255,255,255,.93);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 2px solid rgba(214,55,112,.25);
+      border-radius: 18px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 28px rgba(160,40,80,.2);
+      pointer-events: none;
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+      opacity: 0;
+      max-width: 84vw;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    .toast-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .toast-msg  {
+      font-family: 'Baloo 2', cursive;
+      font-size: clamp(.9rem, 4vw, 1.05rem);
+      color: #b02d5a;
+      white-space: normal;
+    }
+
+    /* ── YES screen ── */
+    #yesScreen { display: none; }
+    #yesScreen.show {
+      display: block;
+      animation: popIn .45s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    #yesScreen h1 { font-size: clamp(1.8rem, 7vw, 2.3rem); color: #d63770; }
+    #yesScreen p  { font-size: 1rem; color: #7a3050; margin-top: 10px; line-height: 1.6; }
+    .big-heart {
+      font-size: 5rem;
+      display: block;
+      margin: 10px auto 8px;
+      animation: pulse .8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { transform: scale(1); }
+      35%      { transform: scale(1.22); }
+      65%      { transform: scale(1.08); }
+    }
+
+    /* ── Confetti ── */
+    #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
+  </style>
+</head>
+<body>
+
+<div class="hearts-bg" id="heartsBg"></div>
+<canvas id="confetti"></canvas>
+
+<div class="card">
+
+  <!-- Main screen -->
+  <div id="mainScreen">
+    <h1>Will you be my Valentine?&nbsp;💕</h1>
+
+    <div class="cat-wrap">
+      <span class="sp">✨</span>
+      <span class="sp">💗</span>
+      <span class="sp">✨</span>
+      <svg class="cat-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="100" cy="138" rx="54" ry="46" fill="#fff0f5" stroke="#e8b4c8" stroke-width="2.5"/>
+        <circle  cx="100" cy="88"  r="46"           fill="#fff0f5" stroke="#e8b4c8" stroke-width="2.5"/>
+        <polygon points="60,52 50,22 80,46"   fill="#ffd0e0" stroke="#e8b4c8" stroke-width="2"/>
+        <polygon points="62,50 54,28 76,46"   fill="#ffb3cc"/>
+        <polygon points="140,52 150,22 120,46" fill="#ffd0e0" stroke="#e8b4c8" stroke-width="2"/>
+        <polygon points="138,50 146,28 124,46" fill="#ffb3cc"/>
+        <g transform="translate(100,48)">
+          <ellipse cx="-16" cy="0" rx="14" ry="9" fill="#7ec8e3" stroke="#5aa8c8" stroke-width="1.5"/>
+          <ellipse cx="16"  cy="0" rx="14" ry="9" fill="#7ec8e3" stroke="#5aa8c8" stroke-width="1.5"/>
+          <circle  cx="0"   cy="0" r="6"           fill="#5aa8c8"/>
+        </g>
+        <ellipse cx="72"  cy="96" rx="13" ry="8" fill="#ffb3cc" opacity=".65"/>
+        <ellipse cx="128" cy="96" rx="13" ry="8" fill="#ffb3cc" opacity=".65"/>
+        <g transform="translate(84,86)">
+          <path d="M0-5C0-9 6-9 6-5 6-1 0,3 0,3 0,3-6-1-6-5-6-9 0-9 0-5Z" fill="#e8638c"/>
+        </g>
+        <g transform="translate(116,86)">
+          <path d="M0-5C0-9 6-9 6-5 6-1 0,3 0,3 0,3-6-1-6-5-6-9 0-9 0-5Z" fill="#e8638c"/>
+        </g>
+        <polygon points="100,100 96,106 104,106" fill="#e8638c"/>
+        <path d="M94 108Q100 115 106 108" stroke="#c06080" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <line x1="72"  y1="103" x2="50"  y2="98"  stroke="#c8a0b8" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="72"  y1="108" x2="50"  y2="108" stroke="#c8a0b8" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="72"  y1="113" x2="50"  y2="118" stroke="#c8a0b8" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="128" y1="103" x2="150" y2="98"  stroke="#c8a0b8" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="128" y1="108" x2="150" y2="108" stroke="#c8a0b8" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="128" y1="113" x2="150" y2="118" stroke="#c8a0b8" stroke-width="1.5" stroke-linecap="round"/>
+        <ellipse cx="100" cy="148" rx="26" ry="20" fill="#ffdce8" opacity=".6"/>
+        <ellipse cx="66"  cy="178" rx="16" ry="10" fill="#ffd0e0" stroke="#e8b4c8" stroke-width="2"/>
+        <ellipse cx="134" cy="178" rx="16" ry="10" fill="#ffd0e0" stroke="#e8b4c8" stroke-width="2"/>
+        <path d="M154 165Q185 150 180 125Q175 105 162 118" stroke="#e8b4c8" stroke-width="8" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="btnYes">Yes 🥰</button>
+      <!-- btnNo is placed via JS after layout -->
+    </div>
+  </div>
+
+  <!-- Yes screen -->
+  <div id="yesScreen">
+    <span class="big-heart">💖</span>
+    <h1>Yay! I love you! 🎉</h1>
+    <p>Věděla jsem to! 🥰<br>Šťastný Valentýn, lásko! 💕</p>
+  </div>
+
+</div>
+
+<!-- No button — outside card, placed by JS -->
+<button class="btn" id="btnNo">No</button>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon"></span>
+  <span class="toast-msg"  id="toastMsg"></span>
+</div>
+
+<script>
+(function () {
+
+  /* ── Floating hearts ── */
+  const bg = document.getElementById('heartsBg');
+  const emos = ['💕','💗','💓','💞','🌸','✨','💝','🌷'];
+  for (let i = 0; i < 24; i++) {
+    const s = document.createElement('span');
+    s.className = 'hb';
+    s.textContent = emos[i % emos.length];
+    s.style.setProperty('--x',     Math.random() * 100 + 'vw');
+    s.style.setProperty('--d',     (8 + Math.random() * 8) + 's');
+    s.style.setProperty('--s',     (.8 + Math.random() * 1.1) + 'rem');
+    s.style.setProperty('--delay', (Math.random() * 12) + 's');
+    bg.appendChild(s);
+  }
+
+  /* ── Elements ── */
+  const btnYes    = document.getElementById('btnYes');
+  const btnNo     = document.getElementById('btnNo');
+  const toast     = document.getElementById('toast');
+  const toastIcon = document.getElementById('toastIcon');
+  const toastMsg  = document.getElementById('toastMsg');
+
+  /* ── Place No next to Yes on load ── */
+  function placeNo() {
+    const r = btnYes.getBoundingClientRect();
+    btnNo.style.width  = r.width  + 'px';
+    btnNo.style.height = r.height + 'px';
+    btnNo.style.top    = r.top    + 'px';
+    btnNo.style.left   = (r.right + 14) + 'px';
+  }
+  // run after fonts & layout settle
+  if (document.readyState === 'complete') placeNo();
+  else window.addEventListener('load', placeNo);
+  setTimeout(placeNo, 400);
+
+  /* ── Messages ── */
+  const msgs = [
+    { icon: '🥺', text: 'Jsi si jistá?' },
+    { icon: '👉👈', text: 'Zkus to znovu!' },
+    { icon: '😿', text: 'Kočička teď pláče!' },
+    { icon: '😢', text: 'NEEEEEEEE' },
+    { icon: '💕', text: 'Poslední šance, prosím!' },
+    { icon: '😂', text: 'Jiná možnost stejně neexistuje!' },
+  ];
+
+  let noCount   = 0;
+  let toastTimer = null;
+
+  function showToast(icon, text) {
+    toastIcon.textContent = icon;
+    toastMsg.textContent  = text;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+  }
+
+  /* ── Escape: teleport No to random spot ── */
+  function runAway(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+
+    const bw  = btnNo.offsetWidth  || 100;
+    const bh  = btnNo.offsetHeight || 50;
+    const pad = 18;
+    const W   = window.innerWidth;
+    const H   = window.innerHeight;
+
+    // find spot away from Yes
+    let x, y, safe = false, attempts = 0;
+    while (!safe && attempts < 20) {
+      attempts++;
+      x = pad + Math.random() * (W - bw - pad * 2);
+      y = pad + Math.random() * (H - bh - pad * 2);
+      const yr = btnYes.getBoundingClientRect();
+      safe = !(x < yr.right + 55 && x + bw > yr.left - 55 &&
+               y < yr.bottom + 55 && y + bh > yr.top  - 55);
+    }
+
+    btnNo.style.left = x + 'px';
+    btnNo.style.top  = y + 'px';
+
+    noCount++;
+
+    // grow Yes
+    const scale = 1 + noCount * 0.18;
+    btnYes.style.transform = `scale(${Math.min(scale, 2.4)})`;
+
+    // show toast
+    const msg = msgs[Math.min(noCount - 1, msgs.length - 1)];
+    showToast(msg.icon, msg.text);
+
+    // after 6 tries, fade No out
+    if (noCount >= 6) {
+      btnNo.style.opacity        = '0';
+      btnNo.style.pointerEvents  = 'none';
+    }
+  }
+
+  // touchstart fires before the finger lands → always escapes
+  btnNo.addEventListener('touchstart', runAway, { passive: false });
+  btnNo.addEventListener('mouseenter', runAway);
+
+  /* ── Yes clicked ── */
+  btnYes.addEventListener('click', () => {
+    document.getElementById('mainScreen').style.display = 'none';
+    document.getElementById('yesScreen').classList.add('show');
+    btnNo.style.display = 'none';
+    toast.classList.remove('show');
+    launchConfetti();
+  });
+
+  /* ── Confetti ── */
+  const cv  = document.getElementById('confetti');
+  const ctx = cv.getContext('2d');
+
+  function launchConfetti() {
+    cv.width  = window.innerWidth;
+    cv.height = window.innerHeight;
+    const colors = ['#e8638c','#f4a0bc','#7ec8e3','#4caf82','#ffe082','#ce93d8','#ff8a80'];
+    const pieces = Array.from({ length: 110 }, () => ({
+      x: Math.random() * cv.width,
+      y: -10 - Math.random() * 150,
+      r: 4 + Math.random() * 5,
+      d: 1.8 + Math.random() * 2.4,
+      c: colors[Math.floor(Math.random() * colors.length)],
+      a: Math.random() * Math.PI * 2,
+      as: .06 + Math.random() * .08,
+      rect: Math.random() > .45,
+    }));
+
+    (function draw() {
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      let live = false;
+      pieces.forEach(p => {
+        p.a += p.as;
+        p.y += p.d;
+        ctx.fillStyle = p.c;
+        if (p.rect) {
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.a);
+          ctx.fillRect(-p.r, -p.r * .5, p.r * 2, p.r);
+          ctx.restore();
+        } else {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        if (p.y < cv.height + 30) live = true;
+      });
+      if (live) requestAnimationFrame(draw);
+    })();
+  }
+
+})();
+</script>
+</body>
+</html>
