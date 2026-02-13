@@ -157,22 +157,102 @@
     #btnYes.pulsing { animation: yesPulse .5s ease-out both; }
 
     /* ── Yes screen ── */
-    #yesScreen { display: none; }
+    #yesScreen {
+      display: none;  /* JS sets display:block then adds .visible + .run */
+    }
     #yesScreen.visible {
-      display: block;
       animation: popIn .38s cubic-bezier(.34,1.56,.64,1) both;
     }
-    #yesScreen h1 {
-      font-family: 'Baloo 2', cursive;
-      font-size: clamp(1.8rem, 7vw, 2.3rem);
-      color: #d63770;
-    }
-    #yesScreen p { font-size: 1rem; color: #7a3050; margin-top: 10px; line-height: 1.6; }
 
+
+    /* ── Yes screen — rose scene ── */
+    .flower-stage {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 10px;
+      height: 120px;
+      margin: 4px 0 8px;
+      position: relative;
+      overflow: visible;
+    }
+
+    /* Ground strip — stretches full card width */
+    .flower-stage::after {
+      content: '';
+      position: absolute;
+      bottom: -6px; left: -28px; right: -28px;
+      height: 10px;
+      background: linear-gradient(to bottom, #a0d468, #7cb342);
+      border-radius: 6px;
+    }
+
+    /* Each rose starts below, grows up with staggered delay, then sways */
+    .rose {
+      opacity: 0;
+      transform: translateY(80px);
+      transform-origin: bottom center;
+      flex-shrink: 0;
+    }
+    .run .rose-1 { animation: roseGrow .7s cubic-bezier(.34,1.56,.64,1) .05s both,
+                               sway    2.4s ease-in-out                  1.0s infinite; }
+    .run .rose-2 { animation: roseGrow .7s cubic-bezier(.34,1.56,.64,1) .35s both,
+                               sway    2.4s ease-in-out                  1.3s infinite; }
+    .run .rose-3 { animation: roseGrow .7s cubic-bezier(.34,1.56,.64,1) .65s both,
+                               sway    2.4s ease-in-out                  1.6s infinite; }
+    @keyframes roseGrow {
+      0%   { opacity: 0; transform: translateY(80px); }
+      100% { opacity: 1; transform: translateY(0);    }
+    }
+    @keyframes sway {
+      0%,100% { transform: rotate(0deg);   }
+      30%      { transform: rotate(-5deg);  }
+      70%      { transform: rotate(5deg);   }
+    }
+
+    /* "Pravé kytičky" label */
+    .real-flowers-hint {
+      font-family: 'Baloo 2', cursive;
+      font-size: .88rem;
+      color: #b05070;
+      margin-top: 2px;
+      margin-bottom: 6px;
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    .run .real-flowers-hint {
+      animation: fadeUp .5s ease 1.7s both;
+    }
+
+    /* Text lines fade up */
+    .yes-title {
+      font-family: 'Baloo 2', cursive;
+      font-size: clamp(1.6rem, 6.5vw, 2.1rem);
+      color: #d63770;
+      opacity: 0; transform: translateY(10px);
+    }
+    .run .yes-title { animation: fadeUp .5s ease 1.2s both; }
+
+    .yes-sub {
+      font-size: 1rem; color: #7a3050;
+      line-height: 1.6;
+      opacity: 0; transform: translateY(8px);
+    }
+    .run .yes-sub { animation: fadeUp .5s ease 2.1s both; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Big heart — last to appear */
     .big-heart {
-      font-size: 5rem; display: block;
-      margin: 10px auto 8px;
-      animation: pulse .8s ease-in-out infinite;
+      font-size: 4rem; display: block;
+      margin: 4px auto 8px;
+      opacity: 0;
+    }
+    .run .big-heart {
+      animation: fadeUp .4s ease 2.6s both,
+                 pulse   .8s ease-in-out 3s infinite;
     }
     @keyframes pulse {
       0%,100% { transform: scale(1); }
@@ -263,15 +343,85 @@
     </div>
 
     <div class="btn-row">
-      <button class="btn" id="btnYes">Yes 🥰</button>
-      <button class="btn" id="btnNo">No</button>
+      <button class="btn" id="btnYes">ANO 🥰</button>
+      <button class="btn" id="btnNo">NE 😕</button>
     </div>
   </div>
 
   <div id="yesScreen">
+    <!-- Rose scene — .run added by JS -->
+    <div class="flower-stage" id="flowerStage">
+
+      <!-- Rose 1 (left, shorter) -->
+      <svg class="rose rose-1" width="52" height="108" viewBox="0 0 52 108" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M26 106 Q22 80 26 55" stroke="#4a9e5c" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <path d="M24 82 Q8 74 12 62 Q20 72 24 82Z" fill="#6bbf7a"/>
+        <path d="M28 70 Q44 62 40 50 Q32 60 28 70Z" fill="#6bbf7a"/>
+        <!-- thorns -->
+        <path d="M25 90 L19 86" stroke="#4a9e5c" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M27 76 L33 72" stroke="#4a9e5c" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- rose bud outer petals -->
+        <ellipse cx="26" cy="32" rx="12" ry="16" fill="#c0392b"/>
+        <ellipse cx="18" cy="36" rx="9"  ry="13" fill="#c0392b" transform="rotate(-20 18 36)"/>
+        <ellipse cx="34" cy="36" rx="9"  ry="13" fill="#c0392b" transform="rotate(20 34 36)"/>
+        <!-- inner petals -->
+        <ellipse cx="26" cy="28" rx="9"  ry="13" fill="#e74c3c"/>
+        <ellipse cx="20" cy="30" rx="7"  ry="10" fill="#e74c3c" transform="rotate(-15 20 30)"/>
+        <ellipse cx="32" cy="30" rx="7"  ry="10" fill="#e74c3c" transform="rotate(15 32 30)"/>
+        <!-- centre -->
+        <ellipse cx="26" cy="24" rx="6"  ry="7"  fill="#f1948a"/>
+        <ellipse cx="26" cy="21" rx="4"  ry="4"  fill="#fadbd8"/>
+        <!-- sepal -->
+        <path d="M20 44 Q26 52 32 44 Q26 48 20 44Z" fill="#27ae60"/>
+      </svg>
+
+      <!-- Rose 2 (center, tallest) -->
+      <svg class="rose rose-2" width="56" height="118" viewBox="0 0 56 118" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M28 116 Q24 86 28 58" stroke="#4a9e5c" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <path d="M26 90 Q8 82 12 68 Q22 78 26 90Z" fill="#6bbf7a"/>
+        <path d="M30 76 Q48 68 44 54 Q34 64 30 76Z" fill="#6bbf7a"/>
+        <path d="M27 100 L20 95" stroke="#4a9e5c" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M29 83 L36 79" stroke="#4a9e5c" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- outer petals -->
+        <ellipse cx="28" cy="32" rx="14" ry="18" fill="#a93226"/>
+        <ellipse cx="18" cy="36" rx="11" ry="15" fill="#c0392b" transform="rotate(-22 18 36)"/>
+        <ellipse cx="38" cy="36" rx="11" ry="15" fill="#c0392b" transform="rotate(22 38 36)"/>
+        <ellipse cx="28" cy="44" rx="12" ry="10" fill="#c0392b" transform="rotate(0 28 44)"/>
+        <!-- mid petals -->
+        <ellipse cx="28" cy="28" rx="10" ry="14" fill="#e74c3c"/>
+        <ellipse cx="20" cy="30" rx="8"  ry="11" fill="#e74c3c" transform="rotate(-15 20 30)"/>
+        <ellipse cx="36" cy="30" rx="8"  ry="11" fill="#e74c3c" transform="rotate(15 36 30)"/>
+        <!-- inner -->
+        <ellipse cx="28" cy="24" rx="7"  ry="9"  fill="#f1948a"/>
+        <ellipse cx="28" cy="20" rx="5"  ry="6"  fill="#fadbd8"/>
+        <ellipse cx="28" cy="17" rx="3"  ry="3"  fill="#fff"/>
+        <path d="M21 48 Q28 57 35 48 Q28 53 21 48Z" fill="#27ae60"/>
+      </svg>
+
+      <!-- Rose 3 (right, medium) -->
+      <svg class="rose rose-3" width="50" height="104" viewBox="0 0 50 104" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M25 102 Q22 76 26 52" stroke="#4a9e5c" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <path d="M24 78 Q9 70 13 58 Q21 68 24 78Z" fill="#6bbf7a"/>
+        <path d="M27 65 Q42 58 38 46 Q30 56 27 65Z" fill="#6bbf7a"/>
+        <path d="M24 88 L18 84" stroke="#4a9e5c" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M26 73 L32 69" stroke="#4a9e5c" stroke-width="1.5" stroke-linecap="round"/>
+        <ellipse cx="25" cy="30" rx="11" ry="15" fill="#c0392b"/>
+        <ellipse cx="17" cy="34" rx="8"  ry="12" fill="#c0392b" transform="rotate(-18 17 34)"/>
+        <ellipse cx="33" cy="34" rx="8"  ry="12" fill="#c0392b" transform="rotate(18 33 34)"/>
+        <ellipse cx="25" cy="26" rx="8"  ry="12" fill="#e74c3c"/>
+        <ellipse cx="19" cy="28" rx="6"  ry="9"  fill="#e74c3c" transform="rotate(-14 19 28)"/>
+        <ellipse cx="31" cy="28" rx="6"  ry="9"  fill="#e74c3c" transform="rotate(14 31 28)"/>
+        <ellipse cx="25" cy="22" rx="5"  ry="7"  fill="#f1948a"/>
+        <ellipse cx="25" cy="19" rx="3.5" ry="4" fill="#fadbd8"/>
+        <path d="M19 42 Q25 50 31 42 Q25 47 19 42Z" fill="#27ae60"/>
+      </svg>
+
+    </div>
+
+    <p class="real-flowers-hint">🌹 Pravé kytičky tě čekají osobně! 🌹</p>
+    <p class="yes-title">JAAAAAAAAAY! Miluju tě! 🎉</p>
     <span class="big-heart">💖</span>
-    <h1>JAAAAAAAAAY! Miluju tě! 🎉</h1>
-    <p>Já to věděl! 🥰<br>Šťastný Valentýn! 💕</p>
+    <p class="yes-sub">Já to věděl! 🥰<br>Šťastný Valentýn! 💕</p>
   </div>
 </div>
 
@@ -292,7 +442,7 @@
     { icon: '😢', text: 'NEEEEEEEEE!!!' },
     { icon: '💕', text: 'Poslední šance, prosím!' },
   ];
-  const LAST_MSG = { icon: '😂', text: 'Nemáš jinou možnost!' };
+  const LAST_MSG = { icon: '😈', text: 'Stejně budeš moje Valentýnka!' };
 
   // Pixel widths per step. YES grows, NO shrinks, gap stays 12px.
   // Row total = YES + 12 + NO = always 272px → card never shifts.
@@ -408,12 +558,11 @@
     void btnYes.offsetWidth;
     btnYes.classList.add('pulsing');
 
-    if (noCount < MSGS.length + 1) {
-      const msg = MSGS[noCount - 1] || LAST_MSG;
-      showToast(msg.icon, msg.text);
-    }
+    // Show toast: MSGS[0..4] for steps 1-5, LAST_MSG for step 6
+    const msg = noCount <= MSGS.length ? MSGS[noCount - 1] : LAST_MSG;
+    showToast(msg.icon, msg.text);
 
-    // After last step, hide No (width is already 0, just remove it visually)
+    // Last step: No width is 0, fade it out visually
     if (NO_W[noCount] === 0) {
       btnNo.style.opacity       = '0';
       btnNo.style.pointerEvents = 'none';
@@ -423,12 +572,6 @@
   btnNo.addEventListener('click',    handleNo);
   btnNo.addEventListener('touchend', e => { e.preventDefault(); handleNo(); }, { passive: false });
 
-  /* ── 6. YES handler ──
-     a) Kill transitions so No disappearing doesn't yank Yes
-     b) Fade No out with opacity (no layout change)
-     c) Play joy bounce
-     d) animationend → swap screens smoothly
-  ── */
   let yesFired = false;
 
   function handleYes() {
@@ -453,8 +596,16 @@
     // d) Swap exactly on animationend
     catSvg.addEventListener('animationend', function onEnd() {
       catSvg.removeEventListener('animationend', onEnd);
+
+      // Show yes screen
       mainScr.style.display = 'none';
-      yesScr.classList.add('visible');
+      yesScr.style.display  = 'block';
+
+      // Two rAF frames: first lets display:block paint, second starts CSS animations
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        yesScr.classList.add('visible', 'run');
+      }));
+
       cancelAnimationFrame(rafId);
       launchConfetti();
     });
