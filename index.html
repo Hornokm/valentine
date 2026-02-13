@@ -11,7 +11,6 @@
     html, body {
       width: 100%; height: 100%;
       overflow: hidden;
-      touch-action: none;
       -webkit-user-select: none;
       user-select: none;
     }
@@ -26,10 +25,7 @@
     }
 
     /* ── Floating hearts ── */
-    .hearts-bg {
-      position: fixed; inset: 0;
-      pointer-events: none; overflow: hidden; z-index: 0;
-    }
+    .hearts-bg { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
     .hb {
       position: absolute;
       bottom: -50px; left: var(--x);
@@ -39,10 +35,10 @@
       opacity: 0;
     }
     @keyframes rise {
-      0%   { transform: translateY(0);       opacity: 0; }
+      0%   { transform: translateY(0);      opacity: 0; }
       10%  { opacity: .5; }
       90%  { opacity: .25; }
-      100% { transform: translateY(-105vh);  opacity: 0; }
+      100% { transform: translateY(-110vh); opacity: 0; }
     }
 
     /* ── Card ── */
@@ -95,21 +91,20 @@
       animation: twinkle 1.8s ease-in-out infinite;
       font-size: .95rem;
     }
-    .sp:nth-child(1) { top: 8px;  left: -10px; animation-delay: 0s; }
-    .sp:nth-child(2) { top: 8px;  right:-10px; animation-delay: .5s; }
+    .sp:nth-child(1) { top: 8px;  left: -10px;              animation-delay: 0s; }
+    .sp:nth-child(2) { top: 8px;  right: -10px;             animation-delay: .5s; }
     .sp:nth-child(3) { top: -8px; left: 50%; transform: translateX(-50%); animation-delay: 1s; }
     @keyframes twinkle {
       0%,100% { opacity: .15; transform: scale(.7); }
       50%      { opacity: 1;   transform: scale(1.3); }
     }
 
-    /* ── Buttons row ── */
+    /* ── Buttons ── */
     .btn-row {
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 12px;
-      min-height: 56px;
     }
 
     .btn {
@@ -123,27 +118,30 @@
       cursor: pointer;
       outline: none;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     #btnYes {
       background: linear-gradient(135deg, #4caf82, #2e8b5e);
       color: #fff;
       box-shadow: 0 5px 18px rgba(76,175,130,.45);
-      /* smooth grow animation */
-      transition: transform .35s cubic-bezier(.34,1.56,.64,1);
-      transform-origin: center;
+      transition: font-size .35s cubic-bezier(.34,1.56,.64,1),
+                  padding   .35s cubic-bezier(.34,1.56,.64,1);
     }
 
-    /* No — starts inline in btn-row, goes fixed on first escape */
     #btnNo {
       background: linear-gradient(135deg, #e05555, #b83d3d);
       color: #fff;
       box-shadow: 0 5px 18px rgba(220,80,80,.4);
-      touch-action: none;
+      /* slide out transition */
+      transition: transform .4s cubic-bezier(.55,.05,.67,.19), opacity .3s;
+      transform-origin: center;
     }
-    #btnNo.flying {
-      position: fixed;
-      z-index: 500;
+    /* when dismissed — slides down and fades */
+    #btnNo.gone {
+      transform: translateY(80px);
+      opacity: 0;
+      pointer-events: none;
     }
 
     /* ── Toast ── */
@@ -151,20 +149,20 @@
       position: fixed;
       top: 20px;
       left: 50%;
-      transform: translateX(-50%) translateY(-110px);
+      transform: translateX(-50%) translateY(-120px);
       z-index: 9000;
-      background: rgba(255,255,255,.93);
+      background: rgba(255,255,255,.95);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border: 2px solid rgba(214,55,112,.25);
-      border-radius: 18px;
-      padding: 12px 20px;
+      border: 2px solid rgba(214,55,112,.2);
+      border-radius: 20px;
+      padding: 13px 22px;
       display: flex;
       align-items: center;
       gap: 10px;
-      box-shadow: 0 6px 28px rgba(160,40,80,.2);
+      box-shadow: 0 6px 28px rgba(160,40,80,.18);
       pointer-events: none;
-      transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+      transition: transform .38s cubic-bezier(.34,1.56,.64,1), opacity .3s;
       opacity: 0;
       max-width: 84vw;
     }
@@ -172,12 +170,11 @@
       transform: translateX(-50%) translateY(0);
       opacity: 1;
     }
-    .toast-icon { font-size: 1.5rem; flex-shrink: 0; }
-    .toast-msg  {
+    .toast-icon { font-size: 1.5rem; flex-shrink: 0; line-height: 1; }
+    .toast-msg {
       font-family: 'Baloo 2', cursive;
       font-size: clamp(.9rem, 4vw, 1.05rem);
       color: #b02d5a;
-      white-space: normal;
     }
 
     /* ── YES screen ── */
@@ -210,8 +207,6 @@
 <canvas id="confetti"></canvas>
 
 <div class="card">
-
-  <!-- Main screen -->
   <div id="mainScreen">
     <h1>Will you be my Valentine?&nbsp;💕</h1>
 
@@ -222,8 +217,8 @@
       <svg class="cat-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
         <ellipse cx="100" cy="138" rx="54" ry="46" fill="#fff0f5" stroke="#e8b4c8" stroke-width="2.5"/>
         <circle  cx="100" cy="88"  r="46"           fill="#fff0f5" stroke="#e8b4c8" stroke-width="2.5"/>
-        <polygon points="60,52 50,22 80,46"   fill="#ffd0e0" stroke="#e8b4c8" stroke-width="2"/>
-        <polygon points="62,50 54,28 76,46"   fill="#ffb3cc"/>
+        <polygon points="60,52 50,22 80,46"    fill="#ffd0e0" stroke="#e8b4c8" stroke-width="2"/>
+        <polygon points="62,50 54,28 76,46"    fill="#ffb3cc"/>
         <polygon points="140,52 150,22 120,46" fill="#ffd0e0" stroke="#e8b4c8" stroke-width="2"/>
         <polygon points="138,50 146,28 124,46" fill="#ffb3cc"/>
         <g transform="translate(100,48)">
@@ -260,16 +255,13 @@
     </div>
   </div>
 
-  <!-- Yes screen -->
   <div id="yesScreen">
     <span class="big-heart">💖</span>
     <h1>Yay! I love you! 🎉</h1>
     <p>Věděla jsem to! 🥰<br>Šťastný Valentýn, lásko! 💕</p>
   </div>
-
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast">
   <span class="toast-icon" id="toastIcon"></span>
   <span class="toast-msg"  id="toastMsg"></span>
@@ -299,15 +291,26 @@
   const toastIcon = document.getElementById('toastIcon');
   const toastMsg  = document.getElementById('toastMsg');
 
-  /* ── Messages ── */
+  /* base values for Yes growth */
+  const BASE_FONT = 1.15;  // rem
+  const BASE_PAD  = 13;    // px
+
+  function growYes(step) {
+    const f = Math.min(BASE_FONT + step * 0.12, BASE_FONT + 5 * 0.12);
+    const p = Math.min(BASE_PAD  + step * 4,    BASE_PAD  + 5 * 4);
+    btnYes.style.fontSize = f + 'rem';
+    btnYes.style.padding  = p + 'px 0';
+  }
+  /* ── Messages ──
+     Last message = No slides away, only Yes remains */
   const msgs = [
     { icon: '🥺', text: 'Jsi si jistá?' },
     { icon: '👉👈', text: 'Zamysli se znovu…' },
     { icon: '😿', text: 'Kočička teď pláče!' },
     { icon: '😢', text: 'To by bylo tak smutné…' },
     { icon: '💕', text: 'Poslední šance, prosím!' },
-    { icon: '😂', text: 'Jiná možnost stejně neexistuje!' },
   ];
+  const LAST_MSG = { icon: '😂', text: 'Jiná možnost neexistuje!' };
 
   let noCount   = 0;
   let toastTimer = null;
@@ -320,67 +323,41 @@
     toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
   }
 
-  /* ── Escape: teleport No to random spot ── */
-  function runAway(e) {
-    if (e) { e.preventDefault(); e.stopPropagation(); }
+  /* ── No clicked ── */
+  btnNo.addEventListener('click', handleNo);
+  btnNo.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    handleNo();
+  }, { passive: false });
 
-    // First escape: snapshot current position, switch to fixed
-    if (!btnNo.classList.contains('flying')) {
-      const r = btnNo.getBoundingClientRect();
-      btnNo.style.width  = r.width  + 'px';
-      btnNo.style.height = r.height + 'px';
-      btnNo.classList.add('flying');
-    }
-
-    const bw  = btnNo.offsetWidth  || 100;
-    const bh  = btnNo.offsetHeight || 50;
-    const pad = 18;
-    const W   = window.innerWidth;
-    const H   = window.innerHeight;
-
-    // find spot away from Yes
-    let x, y, safe = false, attempts = 0;
-    while (!safe && attempts < 20) {
-      attempts++;
-      x = pad + Math.random() * (W - bw - pad * 2);
-      y = pad + Math.random() * (H - bh - pad * 2);
-      const yr = btnYes.getBoundingClientRect();
-      safe = !(x < yr.right + 55 && x + bw > yr.left - 55 &&
-               y < yr.bottom + 55 && y + bh > yr.top  - 55);
-    }
-
-    btnNo.style.left = x + 'px';
-    btnNo.style.top  = y + 'px';
-
+  function handleNo() {
     noCount++;
 
-    // grow Yes
-    const scale = 1 + noCount * 0.18;
-    btnYes.style.transform = `scale(${Math.min(scale, 2.4)})`;
-
-    // show toast
-    const msg = msgs[Math.min(noCount - 1, msgs.length - 1)];
-    showToast(msg.icon, msg.text);
-
-    // after 6 tries, fade No out
-    if (noCount >= 6) {
-      btnNo.style.opacity        = '0';
-      btnNo.style.pointerEvents  = 'none';
+    if (noCount <= msgs.length) {
+      const msg = msgs[noCount - 1];
+      showToast(msg.icon, msg.text);
+      growYes(noCount);
+    } else {
+      showToast(LAST_MSG.icon, LAST_MSG.text);
+      btnNo.classList.add('gone');
+      growYes(msgs.length + 1);
     }
   }
 
-  // touchstart fires before the finger lands → always escapes
-  btnNo.addEventListener('touchstart', runAway, { passive: false });
-  btnNo.addEventListener('mouseenter', runAway);
-
   /* ── Yes clicked ── */
-  btnYes.addEventListener('click', () => {
+  btnYes.addEventListener('click', showYes);
+  btnYes.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    showYes();
+  }, { passive: false });
+
+  function showYes() {
     document.getElementById('mainScreen').style.display = 'none';
     document.getElementById('yesScreen').classList.add('show');
     btnNo.style.display = 'none';
     toast.classList.remove('show');
     launchConfetti();
-  });
+  }
 
   /* ── Confetti ── */
   const cv  = document.getElementById('confetti');
@@ -400,24 +377,19 @@
       as: .06 + Math.random() * .08,
       rect: Math.random() > .45,
     }));
-
     (function draw() {
       ctx.clearRect(0, 0, cv.width, cv.height);
       let live = false;
       pieces.forEach(p => {
-        p.a += p.as;
-        p.y += p.d;
+        p.a += p.as; p.y += p.d;
         ctx.fillStyle = p.c;
         if (p.rect) {
           ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.a);
+          ctx.translate(p.x, p.y); ctx.rotate(p.a);
           ctx.fillRect(-p.r, -p.r * .5, p.r * 2, p.r);
           ctx.restore();
         } else {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
         }
         if (p.y < cv.height + 30) live = true;
       });
