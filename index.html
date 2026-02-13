@@ -108,8 +108,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 14px;
-      /* min-height keeps card stable after No goes flying */
+      gap: 12px;
       min-height: 56px;
     }
 
@@ -117,7 +116,8 @@
       font-family: 'Baloo 2', cursive;
       font-size: 1.15rem;
       font-weight: 800;
-      padding: 13px 36px;
+      padding: 13px 0;
+      width: 44%;
       border: none;
       border-radius: 50px;
       cursor: pointer;
@@ -134,16 +134,16 @@
       transform-origin: center;
     }
 
-    /* No lives at fixed position over the whole screen */
+    /* No — starts inline in btn-row, goes fixed on first escape */
     #btnNo {
       background: linear-gradient(135deg, #e05555, #b83d3d);
       color: #fff;
       box-shadow: 0 5px 18px rgba(220,80,80,.4);
-      position: fixed;
-      /* will be placed by JS after load */
-      z-index: 500;
       touch-action: none;
-      /* no transition — instant teleport */
+    }
+    #btnNo.flying {
+      position: fixed;
+      z-index: 500;
     }
 
     /* ── Toast ── */
@@ -256,7 +256,7 @@
 
     <div class="btn-row">
       <button class="btn" id="btnYes">Yes 🥰</button>
-      <!-- btnNo is placed via JS after layout -->
+      <button class="btn" id="btnNo">No</button>
     </div>
   </div>
 
@@ -268,9 +268,6 @@
   </div>
 
 </div>
-
-<!-- No button — outside card, placed by JS -->
-<button class="btn" id="btnNo">No</button>
 
 <!-- Toast -->
 <div class="toast" id="toast">
@@ -302,25 +299,12 @@
   const toastIcon = document.getElementById('toastIcon');
   const toastMsg  = document.getElementById('toastMsg');
 
-  /* ── Place No next to Yes on load ── */
-  function placeNo() {
-    const r = btnYes.getBoundingClientRect();
-    btnNo.style.width  = r.width  + 'px';
-    btnNo.style.height = r.height + 'px';
-    btnNo.style.top    = r.top    + 'px';
-    btnNo.style.left   = (r.right + 14) + 'px';
-  }
-  // run after fonts & layout settle
-  if (document.readyState === 'complete') placeNo();
-  else window.addEventListener('load', placeNo);
-  setTimeout(placeNo, 400);
-
   /* ── Messages ── */
   const msgs = [
     { icon: '🥺', text: 'Jsi si jistá?' },
-    { icon: '👉👈', text: 'Zkus to znovu!' },
+    { icon: '👉👈', text: 'Zamysli se znovu…' },
     { icon: '😿', text: 'Kočička teď pláče!' },
-    { icon: '😢', text: 'NEEEEEEEE' },
+    { icon: '😢', text: 'To by bylo tak smutné…' },
     { icon: '💕', text: 'Poslední šance, prosím!' },
     { icon: '😂', text: 'Jiná možnost stejně neexistuje!' },
   ];
@@ -339,6 +323,14 @@
   /* ── Escape: teleport No to random spot ── */
   function runAway(e) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
+
+    // First escape: snapshot current position, switch to fixed
+    if (!btnNo.classList.contains('flying')) {
+      const r = btnNo.getBoundingClientRect();
+      btnNo.style.width  = r.width  + 'px';
+      btnNo.style.height = r.height + 'px';
+      btnNo.classList.add('flying');
+    }
 
     const bw  = btnNo.offsetWidth  || 100;
     const bh  = btnNo.offsetHeight || 50;
