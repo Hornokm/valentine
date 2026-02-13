@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Will you be my Valentine? 💕</title>
+  <title>Budeš moje Valentýnka? 💕</title>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,7 +24,6 @@
       min-height: 100dvh;
     }
 
-    /* ── Floating hearts ── */
     .hearts-bg { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
     .hb {
       position: absolute;
@@ -41,7 +40,6 @@
       100% { transform: translateY(-110vh); opacity: 0; }
     }
 
-    /* ── Card ── */
     .card {
       position: relative; z-index: 1;
       background: rgba(255,255,255,.78);
@@ -177,7 +175,6 @@
       color: #b02d5a;
     }
 
-    /* ── YES screen ── */
     #yesScreen { display: none; }
     #yesScreen.show {
       display: block;
@@ -208,7 +205,7 @@
 
 <div class="card">
   <div id="mainScreen">
-    <h1>Will you be my Valentine?&nbsp;💕</h1>
+    <h1>Budeš Moje Valentýnka?&nbsp;💕</h1>
 
     <div class="cat-wrap">
       <span class="sp">✨</span>
@@ -257,7 +254,7 @@
 
   <div id="yesScreen">
     <span class="big-heart">💖</span>
-    <h1>Yay! I love you! 🎉</h1>
+    <h1>JAAAAAAAAAY! Miluju tě! 🎉</h1>
     <p>Věděla jsem to! 🥰<br>Šťastný Valentýn, lásko! 💕</p>
   </div>
 </div>
@@ -305,12 +302,12 @@
      Last message = No slides away, only Yes remains */
   const msgs = [
     { icon: '🥺', text: 'Jsi si jistá?' },
-    { icon: '👉👈', text: 'Zamysli se znovu…' },
+    { icon: '👉👈', text: 'Zkus to znovu...' },
     { icon: '😿', text: 'Kočička teď pláče!' },
-    { icon: '😢', text: 'To by bylo tak smutné…' },
+    { icon: '😢', text: 'NEEEEEEEEE!!!' },
     { icon: '💕', text: 'Poslední šance, prosím!' },
   ];
-  const LAST_MSG = { icon: '😂', text: 'Jiná možnost neexistuje!' };
+  const LAST_MSG = { icon: '😂', text: 'Nemáš jinou možnost!' };
 
   let noCount   = 0;
   let toastTimer = null;
